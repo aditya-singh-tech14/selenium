@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'Selenium_Node' }
+    agent { label 'Selenium-Node' }
     stages {
         stage('Clone Repository') {
             steps {
