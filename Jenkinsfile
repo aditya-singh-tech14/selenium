@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         PYTHON_ENV = "/usr/bin/python3"  // Path to Python executable (adjust if needed)
+        CHROMEDRIVER_PATH = '/usr/local/bin/chromedriver'  // Path to ChromeDriver
     }
 
     stages {

@@ -21,7 +21,7 @@ def setup_class(request):
     chrome_options.add_argument("--disable-extensions")  # Disable extensions
 
     # Provide the path to chromedriver (you can modify it to the location where your chromedriver is located)
-    chrome_driver_path = r"C:\Users\Laudiuu\chromedriver-win64\chromedriver.exe"  # Update this with your chromedriver path
+    chrome_driver_path = r"/usr/local/bin/chromedriver"  # Update this with your chromedriver path
     service = Service(chrome_driver_path)
 
     # Initialize the Chrome WebDriver with options and service
