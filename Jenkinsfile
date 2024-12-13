@@ -1,11 +1,3 @@
-sh '''
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-'''
-
-
-
 pipeline {
     agent { label 'Selenium-Node' }
     stages {
@@ -14,14 +6,21 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/aditya-singh-tech14/selenium.git'
             }
         }
-        stage('Install Dependencies') {
+        stage('Setup Environment') {
             steps {
-                sh 'pip3 install -r requirements.txt'
+                sh '''
+                python3 -m venv venv
+                source venv/bin/activate
+                pip install -r requirements.txt
+                '''
             }
         }
         stage('Run Tests') {
             steps {
-                sh 'pytest --html=report.html'
+                sh '''
+                source venv/bin/activate
+                pytest --html=report.html
+                '''
             }
         }
     }
