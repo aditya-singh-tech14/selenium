@@ -9,7 +9,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout your code from the GitHub repository
-                git 'https://github.com/aditya-singh-tech14/selenium.git'
+                git branch: 'main', url: 'https://github.com/aditya-singh-tech14/selenium.git'
             }
         }
 
