@@ -14,22 +14,11 @@ x_path_LoginButton = '/html/body/div[1]/div[2]/div/div/div/div/div/div/div[1]/fo
 
 @pytest.fixture(scope="class")
 def setup_class(request):
-    # Set up Chrome options
-    chrome_options = Options()
-    chrome_options.add_argument("--start-maximized")  # Open Chrome in maximized mode
-    chrome_options.add_argument("--disable-infobars")  # Disable info bars
-    chrome_options.add_argument("--disable-extensions")  # Disable extensions
-
-    # Provide the path to chromedriver (you can modify it to the location where your chromedriver is located)
-    chrome_driver_path = r"/usr/local/bin/chromedriver"  # Update this with your chromedriver path
-    service = Service(chrome_driver_path)
-
-    # Initialize the Chrome WebDriver with options and service
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-
+    driver = webdriver.Chrome()
     request.cls.driver = driver  # Assign driver to the class instance
     yield
     driver.quit()
+
 
 
 @pytest.mark.usefixtures("setup_class")
