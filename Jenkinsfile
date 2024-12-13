@@ -6,27 +6,22 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/aditya-singh-tech14/selenium.git'
             }
         }
-        stage('Setup Environment') {
+        stage('Install Dependencies') {
             steps {
-                sh '''
-                python3 -m venv venv
-                source venv/bin/activate
-                pip install -r requirements.txt
-                '''
+                sh 'pip3 install -r requirements.txt'
             }
         }
         stage('Run Tests') {
             steps {
-                sh '''
-                source venv/bin/activate
-                pytest --html=report.html
-                '''
+                sh 'pytest --html=report.html'
             }
         }
     }
     post {
         always {
-            archiveArtifacts artifacts: 'report.html', fingerprint: true
+            node {
+                archiveArtifacts artifacts: 'report.html', fingerprint: true
+            }
         }
     }
 }
