@@ -31,7 +31,7 @@ pipeline {
                 script {
                     // Run the Pytest test cases
                     sh '''
-                    source venv/bin/activate
+                    . venv/bin/activate
                     pytest --maxfail=1 --disable-warnings -q
                     '''
                 }
