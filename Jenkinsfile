@@ -1,24 +1,55 @@
 pipeline {
-    agent { label 'Selenium-Node' }
+    agent any
+
+    environment {
+        PYTHON_ENV = "/usr/bin/python3"  // Path to Python executable (adjust if needed)
+    }
+
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/aditya-singh-tech14/selenium.git'
+                // Checkout your code from the GitHub repository
+                git 'https://github.com/aditya-singh-tech14/selenium.git'
             }
         }
+
         stage('Install Dependencies') {
             steps {
-                sh '''
-                python3 -m venv venv
-                source venv/bin/activate
-                pip install -r requirements.txt
-                '''
+                script {
+                    // Install required Python packages
+                    sh '''
+                    python -m venv venv
+                    source venv/bin/activate
+                    pip install -r requirements.txt
+                    '''
+                }
             }
         }
+
         stage('Run Tests') {
             steps {
-                sh 'pytest --html=report.html'
+                script {
+                    // Run the Pytest test cases
+                    sh '''
+                    source venv/bin/activate
+                    pytest --maxfail=1 --disable-warnings -q
+                    '''
+                }
             }
+        }
+    }
+
+    post {
+        always {
+            // Clean up actions if needed
+            echo 'Cleaning up...'
+            deleteDir()  // Clean workspace after build
+        }
+        success {
+            echo 'Tests passed!'
+        }
+        failure {
+            echo 'Tests failed!'
         }
     }
 }
