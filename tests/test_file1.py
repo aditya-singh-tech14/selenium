@@ -1,19 +1,21 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 
-options = Options()
-options.add_argument("--headless")  # Run Chrome in headless mode
-options.add_argument("--no-sandbox")  # Disable sandbox (useful in CI environments)
-options.add_argument("--disable-dev-shm-usage")  # Disable /dev/shm usage (useful for Docker)
-driver = webdriver.Chrome(options=options)
+# Set the path for Chrome and Chromedriver
+chrome_path = "/usr/bin/google-chrome"
+chromedriver_path = "/usr/local/bin/chromedriver"
 
+# Set the Chrome options to use the given Chrome path
+chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = chrome_path
 
-# Start Chrome browser
-driver = webdriver.Chrome()
+# Initialize the webdriver with the specified chromedriver
+driver = webdriver.Chrome(executable_path=chromedriver_path, options=chrome_options)
 
-# Open a website
+# Open a webpage to test the setup
 driver.get("https://www.google.com")
-print("Title:", driver.title)
+
+# Print the title of the page
+print("Page Title:", driver.title)
 
 # Close the browser
 driver.quit()
