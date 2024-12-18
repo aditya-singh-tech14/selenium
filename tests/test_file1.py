@@ -1,29 +1,35 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 
-# Set the path for Chrome and Chromedriver
-chrome_path = "/usr/bin/google-chrome"
-chromedriver_path = "/usr/local/bin/chromedriver"
+def test_pipeline():
+    try:
+        # Set up Chrome options for CI/CD pipeline
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+        chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
+        chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome resource constraints
 
-# Set the Chrome options to use the given Chrome path
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = "/usr/bin/google-chrome"
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--remote-debugging-port=9222")
+        # Specify the path to ChromeDriver
+        service = Service("/usr/local/bin/chromedriver")  # Update the path if necessary
 
+        # Create the WebDriver instance
+        driver = webdriver.Chrome(service=service, options=chrome_options)
 
+        # Navigate to a test website
+        driver.get("https://google.com")
 
-service = Service(chromedriver_path)
+        # Check if the page title is as expected
+        assert "Example Domain" in driver.title, "Page title does not match!"
 
-driver = webdriver.Chrome(service=service, options=chrome_options)
+        print("Test passed: Page title is as expected.")
 
-# Open a webpage to test the setup
-driver.get("https://www.google.com")
+        # Close the browser
+        driver.quit()
 
-# Print the title of the page
-print("Page Title:", driver.title)
+    except Exception as e:
+        print(f"Test failed: {e}")
 
-# Close the browser
-driver.quit()
+# Run the test
+if __name__ == "__main__":
+    test_pipeline()
