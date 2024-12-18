@@ -5,7 +5,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Fetch the repository
-                git url: 'https://github.com/aditya-singh-tech14/selenium.git', credentialsId: 'aditya-github-pass'
+                git url: 'https://github.com/aditya-singh-tech14/selenium.git', branch: 'driver', credentialsId: 'aditya-github-pass'
+
             }
         }
 
