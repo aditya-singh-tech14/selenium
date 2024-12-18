@@ -1,75 +1,76 @@
 pipeline {
     agent any
 
-    environment {
-        PYTHON_ENV = "/usr/bin/python3"  // Path to Python executable
-        CHROMEDRIVER_PATH = '/usr/local/bin/chromedriver'  // Path to ChromeDriver
-    }
-
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from the specified GitHub repository
-                git branch: 'main', url: 'https://github.com/aditya-singh-tech14/selenium.git'
+                // Fetch the repository
+                git url: 'https://github.com/aditya-singh-tech14/selenium.git', credentialsId: 'aditya-github-pass'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                script {
-                    // Set up a virtual environment and install dependencies
-                    sh '''
+                // Setup Python environment and install required packages
+                sh '''
                     python3 -m venv venv
                     . venv/bin/activate
-                    pip install -r requirements.txt
-                    '''
-                }
+                    pip install --force-reinstall -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                script {
-                    // Execute Pytest with a maximum failure threshold of 1
-                    def testResult = sh(
-                        script: '''
-                        . venv/bin/activate
-                        pytest --maxfail=1 --disable-warnings -q
-                        ''',
-                        returnStatus: true
-                    )
-
-                    // Fail the build if more than 1 test fails
-                    if (testResult != 0) {
-                        error("Test cases failed! Exceeded maximum allowed failures (maxfail=1).")
-                    }
-                }
+                // Run Selenium Pytest test cases with max failure = 1
+                sh '''
+                    . venv/bin/activate
+                    pytest --maxfail=1 --disable-warnings -q
+                '''
             }
         }
 
         stage('Deploy to Production') {
             when {
-                expression {
-                    // Only run this stage if the tests passed successfully
-                    currentBuild.result == null || currentBuild.result == 'SUCCESS'
-                }
+                // Deploy only if all test cases pass
+                expression { currentBuild.result == null || currentBuild.result == 'SUCCESS' }
             }
             steps {
-                // Add your deployment steps here
-                echo 'Deploying to production...'
-                sh './deploy_to_prod.sh'  // Replace with your deployment script
+                // Add the provided deployment script
+                writeFile file: 'deploy_to_prod.sh', text: '''#!/bin/sh
+
+# Install dependencies, forcing reinstallation if necessary
+npm install --force
+
+# Load nvm and set the desired Node.js version
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh"
+nvm use 20.9.0
+
+# Verify the Node.js version
+node --version
+
+# Restart the PM2-managed process with the correct interpreter
+pm2 restart 0 --update-env --interpreter "$(which node)"
+
+# Save the current PM2 configuration
+pm2 save
+
+# Display the status of all PM2-managed processes
+pm2 status
+                '''
+                sh '''
+                    chmod +x deploy_to_prod.sh
+                    ./deploy_to_prod.sh
+                '''
             }
         }
     }
 
     post {
         always {
-            // Clean up workspace after the build
             echo 'Cleaning up...'
-            deleteDir()
-        }
-        success {
-            echo 'Build succeeded! Code has been deployed to production.'
+            deleteDir() // Clean up the workspace
         }
         failure {
             echo 'Build failed. Please check the test case results.'
