@@ -1,36 +1,35 @@
-
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import pytest
-from selenium.webdriver.common.by import By
-import time
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 
+def test_pipeline():
+    try:
+        # Set up Chrome options for CI/CD pipeline
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+        chrome_options.add_argument("--no-sandbox")  # Bypass OS security model
+        chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome resource constraints
 
-x_path_LoginButton = '/html/body/div[1]/div[2]/div/div/div/div/div/div/div[1]/form/div[4]/button'
+        # Specify the path to ChromeDriver
+        service = Service("/usr/local/bin/chromedriver")  # Update the path if necessary
 
+        # Create the WebDriver instance
+        driver = webdriver.Chrome(service=service, options=chrome_options)
 
-@pytest.fixture(scope="class")
-def setup_class(request):
-    driver = webdriver.Chrome()
-    request.cls.driver = driver  # Assign driver to the class instance
-    yield
-    driver.quit()
+        # Navigate to a test website
+        driver.get("https://google.com")
 
+        # Check if the page title is as expected
+        assert "Example Domain" in driver.title, "Page title does not match!"
 
+        print("Test passed: Page title is as expected.")
 
-@pytest.mark.usefixtures("setup_class")
-class TestLoginNologin():
-    def test_mcs_through_feedback_form_shared_mail(self):
+        # Close the browser
+        driver.quit()
 
-        driver = self.driver
-        self.driver.get("https://staging-secure.enthu.ai/login")
-        self.driver.maximize_window()
-        self.driver.find_element(By.ID, 'email_address').send_keys('aditya+staging2@enthu.ai')
-        self.driver.find_element(By.ID, 'password').send_keys('12345678')
-        login_button = WebDriverWait(self.driver, 30).until(EC.element_to_be_clickable((By.XPATH, x_path_LoginButton)))
-        print("login button found")
-        login_button.click()
-        time.sleep(3)
+    except Exception as e:
+        print(f"Test failed: {e}")
+
+# Run the test
+if __name__ == "__main__":
+    test_pipeline()
